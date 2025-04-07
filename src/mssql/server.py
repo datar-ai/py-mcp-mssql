@@ -41,7 +41,7 @@ class DBConfig:
                     f"PWD={self.config['password']};"
                     "TrustServerCertificate=yes"
                 )
-                self.connection = pyodbc.connect(conn_str, readonly=True)  # เพิ่ม readonly=True
+                self.connection = pyodbc.connect(conn_str, readonly=True)  # add readonly=True
             return self.connection
         except:
             self.connection = None
@@ -50,33 +50,33 @@ class DBConfig:
 class SQLValidator:
     @staticmethod
     def is_read_only_query(query: str) -> bool:
-        # ทำความสะอาด query
+        # Clean the query
         clean_query = query.strip().upper()
         
-        # รายการคำสั่งที่อนุญาต
+        # List of allowed statements
         allowed_statements = [
             'SELECT', 'WITH', 'DECLARE'
         ]
         
-        # รายการคำสั่งที่ไม่อนุญาต
+        # List of forbidden statements
         forbidden_statements = [
             'INSERT', 'UPDATE', 'DELETE', 'DROP', 'CREATE', 
             'ALTER', 'TRUNCATE', 'MERGE', 'UPSERT', 'REPLACE',
             'GRANT', 'REVOKE', 'EXEC', 'EXECUTE', 'SP_'
         ]
         
-        # ตรวจสอบว่าเริ่มต้นด้วยคำสั่งที่อนุญาตหรือไม่
+        # Check if it starts with an allowed statement
         starts_with_allowed = any(clean_query.startswith(stmt) for stmt in allowed_statements)
         if not starts_with_allowed:
             return False
             
-        # ตรวจสอบว่ามีคำสั่งต้องห้ามหรือไม่
+        # Check if it contains any forbidden statements
         contains_forbidden = any(stmt in clean_query for stmt in forbidden_statements)
         if contains_forbidden:
             return False
             
-        # ตรวจสอบเพิ่มเติมสำหรับ SQL Injection
-        has_dangerous_chars = re.search(r';\s*\w+', clean_query)  # ตรวจหา semicolon ที่ตามด้วยคำสั่ง
+        # Additional check for SQL Injection
+        has_dangerous_chars = re.search(r';\s*\w+', clean_query)  # Look for semicolons followed by commands
         if has_dangerous_chars:
             return False
             
@@ -156,7 +156,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     if not query:
         raise ValueError("Query is required")
 
-    # ตรวจสอบว่าเป็น read-only query
+    # Check if it's a read-only query
     if not sql_validator.is_read_only_query(query):
         return [TextContent(type="text", text="Error: Only SELECT queries are allowed")]
 

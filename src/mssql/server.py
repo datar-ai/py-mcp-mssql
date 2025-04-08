@@ -33,6 +33,7 @@ class DBConfig:
     def get_connection(self):
         try:
             if not self.connection:
+                logger.info("Attempting to establish new database connection")
                 conn_str = (
                     f"DRIVER={self.config['driver']};"
                     f"SERVER={self.config['server']};"
@@ -42,14 +43,17 @@ class DBConfig:
                     "TrustServerCertificate=yes"
                 )
                 self.connection = pyodbc.connect(conn_str, readonly=True)  # add readonly=True
+                logger.info("Database connection established successfully")
             return self.connection
-        except:
+        except Exception as e:
+            logger.error(f"Failed to establish database connection: {str(e)}")
             self.connection = None
             raise
 
 class SQLValidator:
     @staticmethod
     def is_read_only_query(query: str) -> bool:
+        logger.info(f"Validating query: {query}")
         # Clean the query
         clean_query = query.strip().upper()
         
@@ -68,18 +72,22 @@ class SQLValidator:
         # Check if it starts with an allowed statement
         starts_with_allowed = any(clean_query.startswith(stmt) for stmt in allowed_statements)
         if not starts_with_allowed:
+            logger.warning(f"Query rejected: Does not start with allowed statement")
             return False
             
         # Check if it contains any forbidden statements
         contains_forbidden = any(stmt in clean_query for stmt in forbidden_statements)
         if contains_forbidden:
+            logger.warning(f"Query rejected: Contains forbidden statement")
             return False
             
         # Additional check for SQL Injection
         has_dangerous_chars = re.search(r';\s*\w+', clean_query)  # Look for semicolons followed by commands
         if has_dangerous_chars:
+            logger.warning(f"Query rejected: Potential SQL injection detected")
             return False
             
+        logger.info("Query validation successful")
         return True
 
 db = DBConfig()
@@ -109,6 +117,7 @@ async def list_resources() -> list[Resource]:
 
 @app.read_resource()
 async def read_resource(uri: AnyUrl) -> str:
+    logger.info(f"Resource access attempt for URI: {uri}")
     uri_str = str(uri)
     if not uri_str.startswith("mssql://"):
         raise ValueError(f"Invalid URI scheme: {uri_str}")
@@ -149,6 +158,7 @@ async def list_tools() -> list[Tool]:
 
 @app.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
+    logger.info(f"Tool execution request: {name} with arguments: {arguments}")
     if name != "execute_sql":
         raise ValueError(f"Unknown tool: {name}")
 
@@ -168,11 +178,13 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         columns = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
         result = [",".join(map(str, row)) for row in rows]
+        logger.info(f"Query executed successfully, returned {len(rows)} rows")
         return [TextContent(type="text", text="\n".join([",".join(columns)] + result))]
     except Exception as e:
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 async def main():
+    logger.info("Starting MSSQL MCP server")
     from mcp.server.stdio import stdio_server
     async with stdio_server() as (read_stream, write_stream):
         await app.run(read_stream, write_stream, app.create_initialization_options())

@@ -1,0 +1,135 @@
+{
+  "mcpServers": {
+    "github.com/executeautomation/mcp-playwright": {
+      "autoApprove": [
+        "start_codegen_session",
+        "end_codegen_session",
+        "get_codegen_session",
+        "clear_codegen_session",
+        "playwright_navigate",
+        "playwright_screenshot",
+        "playwright_click",
+        "playwright_iframe_click",
+        "playwright_fill",
+        "playwright_select",
+        "playwright_hover",
+        "playwright_evaluate",
+        "playwright_console_logs",
+        "playwright_close",
+        "playwright_get",
+        "playwright_post",
+        "playwright_put",
+        "playwright_patch",
+        "playwright_delete",
+        "playwright_expect_response",
+        "playwright_assert_response",
+        "playwright_custom_user_agent",
+        "playwright_get_visible_text",
+        "playwright_get_visible_html",
+        "playwright_go_back",
+        "playwright_go_forward",
+        "playwright_drag",
+        "playwright_press_key",
+        "playwright_save_as_pdf"
+      ],
+      "disabled": true,
+      "timeout": 60,
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx.cmd",
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ],
+      "transportType": "stdio"
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/brave-search": {
+      "autoApprove": [
+        "brave_web_search",
+        "brave_local_search"
+      ],
+      "disabled": true,
+      "timeout": 60,
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx.cmd",
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAQXTcsrTMga3PPdKnMiJvj0iu7Wyv"
+      },
+      "transportType": "stdio"
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/time": {
+      "autoApprove": [],
+      "disabled": true,
+      "timeout": 60,
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_server_time",
+        "--local-timezone=Asia/Taipei"
+      ],
+      "transportType": "stdio"
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/puppeteer": {
+      "autoApprove": [
+        "puppeteer_navigate",
+        "puppeteer_screenshot",
+        "puppeteer_click",
+        "puppeteer_fill",
+        "puppeteer_select",
+        "puppeteer_hover",
+        "puppeteer_evaluate"
+      ],
+      "disabled": true,
+      "timeout": 180,
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx.cmd",
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "transportType": "stdio"
+    },
+    "excel": {
+      "disabled": false,
+      "timeout": 60,
+      "command": "python",
+      "args": [
+        "C:/Github/excel-mcp-server/src/excel_mcp/__main__.py"
+      ],
+      "env": {
+        "EXCEL_FILES_PATH": "C:/Users/te-yihsu/Downloads",
+        "PYTHONPATH": "C:/Github/excel-mcp-server",
+        "PYTHONUSERBASE": "C:/Users/te-yihsu/AppData/Local/Programs/Python",
+        "PATH": "C:/Users/te-yihsu/AppData/Local/Programs/Python/Python312/Scripts;%PATH%",
+        "LOG_LEVEL": "ERROR"
+      },
+      "transportType": "stdio"
+    },
+    "mssql": {
+      "autoApprove": [
+        "execute_sql"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "command": "python",
+      "args": [
+        "C:/Github/py-mcp-mssql/src/mssql/server.py"
+      ],
+      "env": {
+        "MSSQL_SERVER": "pdase-cepm-sqlmi.c46da62ba3d7.database.windows.net",
+        "MSSQL_DATABASE": "PKG_ENG",
+        "MSSQL_USER": "cepm_ro",
+        "MSSQL_PASSWORD": "TtztZXVGPJjWIgGMqER9t0X",
+        "MSSQL_DRIVER": "{ODBC Driver 17 for SQL Server}",
+        "PYTHONPATH": "C:/Github/py-mcp-mssql"
+      },
+      "transportType": "stdio"
+    }
+  }
+}

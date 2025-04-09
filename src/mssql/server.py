@@ -10,6 +10,7 @@ from mcp.server import Server
 from mcp.types import Resource, Tool, TextContent
 from pydantic import AnyUrl
 import re
+import urllib.parse
 
 # Load environment variables
 load_dotenv()
@@ -104,7 +105,7 @@ async def list_resources() -> list[Resource]:
         
         return [
             Resource(
-                uri=f"mssql://{table[0]}/data",
+                uri=f"mssql://{urllib.parse.quote(table[0])}/data",
                 name=f"Table: {table[0]}",
                 mimeType="application/json",
                 description=f"Data in table {table[0]}"
@@ -122,7 +123,8 @@ async def read_resource(uri: AnyUrl) -> str:
     if not uri_str.startswith("mssql://"):
         raise ValueError(f"Invalid URI scheme: {uri_str}")
         
-    table = uri_str[8:].split('/')[0]
+    encoded_table = uri_str[8:].split('/')[0]
+    table = urllib.parse.unquote(encoded_table)
     query = f"SELECT TOP 100 * FROM {table}"
     
     if not sql_validator.is_read_only_query(query):
